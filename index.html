@@ -283,6 +283,38 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
 .soc{width:32px;height:32px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;text-decoration:none;color:var(--foam);transition:all .25s;}
 .soc:hover{border-color:var(--foam);background:var(--glass);}
 
+/* ── VIDÉO ── */
+.video-bg{background:linear-gradient(180deg,var(--ink) 0%,#06101e 50%,var(--ink) 100%);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.video-wrap{position:relative;width:100%;max-width:860px;margin:0 auto;aspect-ratio:16/9;border:1px solid var(--border);overflow:hidden;background:#000;}
+.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--deep),var(--ocean));cursor:pointer;transition:opacity .3s;}
+.video-placeholder .play-btn{width:72px;height:72px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:16px;box-shadow:0 0 0 0 rgba(240,168,64,.4);animation:playPulse 2s ease infinite;transition:transform .2s;}
+.video-placeholder:hover .play-btn{transform:scale(1.1);}
+@keyframes playPulse{0%{box-shadow:0 0 0 0 rgba(240,168,64,.4)}70%{box-shadow:0 0 0 20px rgba(240,168,64,0)}100%{box-shadow:0 0 0 0 rgba(240,168,64,0)}}
+.video-placeholder p{font-family:var(--ff-mono);font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:rgba(245,232,206,.7);}
+.video-note{text-align:center;margin-top:20px;font-family:var(--ff-mono);font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:rgba(141,212,240,.4);}
+/* ── SPONSORS BANNIÈRE ── */
+.sponsors-bg{background:linear-gradient(180deg,var(--ink) 0%,#050e1c 50%,var(--ink) 100%);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;}
+.sponsors-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:32px;}
+.sponsor-card{border:1px solid var(--border);padding:28px 20px;background:var(--glass2);text-align:center;transition:border-color .3s,transform .3s,background .3s;position:relative;overflow:hidden;}
+.sponsor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--horizon),var(--foam));transform:scaleX(0);transition:transform .4s;transform-origin:left;}
+.sponsor-card:hover{border-color:rgba(141,212,240,.3);transform:translateY(-4px);background:var(--glass);}
+.sponsor-card:hover::before{transform:scaleX(1);}
+.sponsor-logo{width:80px;height:80px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:2rem;border:1px solid var(--border);background:linear-gradient(135deg,var(--deep),var(--ocean));}
+.sponsor-name{font-family:var(--ff-mono);font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream);margin-bottom:4px;font-weight:700;}
+.sponsor-type{font-family:var(--ff-mono);font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--sun);}
+.sponsor-card.titre::before{background:linear-gradient(to right,var(--sun),#f5c060);transform:scaleX(1);}
+.sponsor-card.titre{border-color:rgba(240,168,64,.25);}
+.sponsor-slot{border:1px dashed rgba(141,212,240,.15);padding:28px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:border-color .3s,background .3s;}
+.sponsor-slot:hover{border-color:rgba(141,212,240,.35);background:var(--glass2);}
+.sponsor-slot-icon{font-size:1.6rem;opacity:.3;}
+.sponsor-slot-txt{font-family:var(--ff-mono);font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:rgba(141,212,240,.35);}
+.ticker-wrap{overflow:hidden;border-top:1px solid var(--border);padding:16px 0;margin-top:8px;}
+.ticker{display:flex;gap:60px;animation:tickerScroll 22s linear infinite;white-space:nowrap;}
+.ticker:hover{animation-play-state:paused;}
+.ticker-item{font-family:var(--ff-mono);font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:rgba(141,212,240,.4);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.ticker-dot{width:4px;height:4px;border-radius:50%;background:var(--sun);}
+@keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 /* ── RESPONSIVE ── */
 @media(max-width:1000px){
   nav{padding:16px 20px;}nav.scrolled{padding:12px 20px;}
@@ -308,6 +340,8 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
   <a href="#accueil" class="nav-logo">Open<span>Sea</span>Family</a>
   <ul class="nav-links">
     <li><a href="#projet">Le Projet</a></li>
+    <li><a href="#video">Vidéo</a></li>
+    <li><a href="#soutiens">Sponsors</a></li>
     <li><a href="#suivi">Suivi Live</a></li>
     <li><a href="#famille">La Famille</a></li>
     <li><a href="#route">La Route</a></li>
@@ -382,12 +416,114 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
   </div>
 </section>
 
-<!-- ══ SUIVI ══════════════════════════════════════ -->
+<!-- ══ VIDÉO DE PRÉSENTATION ══════════════════════ -->
+<!-- ✏️ MODIFIEZ ICI : remplacez YOUR_VIDEO_ID par l'ID de votre vidéo YouTube -->
+<!-- Ex : https://www.youtube.com/watch?v=ABC123XYZ → ID = ABC123XYZ -->
+<div class="video-bg sf" id="video">
+  <div class="si s">
+    <div class="rv" style="text-align:center;margin-bottom:44px;">
+      <span class="lbl" style="display:block;text-align:center;">02 — Notre histoire</span>
+      <h2 class="ttl" style="text-align:center;">Regardez notre<br><em>vidéo de présentation</em></h2>
+      <div class="rule" style="margin:0 auto 0;"></div>
+    </div>
+    <div class="video-wrap rv" id="videoContainer">
+      <!-- Placeholder affiché AVANT que vous ayez une vidéo YouTube -->
+      <div class="video-placeholder" id="videoPlaceholder">
+        <div class="play-btn">▶</div>
+        <p>Vidéo de présentation — Bientôt disponible</p>
+      </div>
+      <!-- Décommentez et remplacez YOUR_VIDEO_ID quand votre vidéo est en ligne :
+      <iframe
+        src="https://www.youtube.com/embed/YOUR_VIDEO_ID?rel=0&modestbranding=1&color=white"
+        title="OpenSeaFamily — Tour du Monde à la Voile en Famille — Présentation"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        loading="lazy">
+      </iframe>
+      -->
+    </div>
+    <p class="video-note rv">⚓ OpenSeaFamily · Famille Bataillard · Bourg d'Oisans · Isère</p>
+  </div>
+</div>
+
+<!-- ══ ILS NOUS SOUTIENNENT ══════════════════════ -->
+<!-- ✏️ MODIFIEZ ICI : ajoutez vos vrais sponsors quand vous en avez -->
+<div class="sponsors-bg sf" id="soutiens">
+  <div class="si s">
+    <div class="rv" style="margin-bottom:48px;">
+      <span class="lbl">03 — Ils nous soutiennent</span>
+      <h2 class="ttl">Nos partenaires<br><em>embarquent avec nous</em></h2>
+      <div class="rule"></div>
+      <p style="font-size:.95rem;color:rgba(245,232,206,.6);max-width:580px;line-height:1.85;">Ils ont choisi de nous accompagner dans cette aventure. Merci à chacun de nos partenaires pour leur confiance et leur soutien.</p>
+    </div>
+
+    <!-- Grille sponsors — ajoutez vos vrais sponsors ici -->
+    <div class="sponsors-grid rv">
+
+      <!-- ══ SPONSORS ACTUELS ══ -->
+      <!-- Décommentez et personnalisez quand vous avez des sponsors :
+
+      <div class="sponsor-card titre">
+        <div class="sponsor-logo">🏆</div>
+        <div class="sponsor-name">Nom Sponsor</div>
+        <div class="sponsor-type">⭐ Partenaire Titre</div>
+      </div>
+
+      <div class="sponsor-card">
+        <div class="sponsor-logo">⚓</div>
+        <div class="sponsor-name">Nom Sponsor</div>
+        <div class="sponsor-type">🥇 Partenaire Or</div>
+      </div>
+
+      -->
+
+      <!-- ══ SLOTS DISPONIBLES (remplacés par les vrais sponsors au fur et à mesure) ══ -->
+      <a href="#contact" class="sponsor-slot">
+        <div class="sponsor-slot-icon">⭐</div>
+        <div class="sponsor-slot-txt">Partenaire Titre<br>disponible</div>
+      </a>
+      <a href="#contact" class="sponsor-slot">
+        <div class="sponsor-slot-icon">🥇</div>
+        <div class="sponsor-slot-txt">Partenaire Or<br>disponible</div>
+      </a>
+      <a href="#contact" class="sponsor-slot">
+        <div class="sponsor-slot-icon">🥈</div>
+        <div class="sponsor-slot-txt">Partenaire Argent<br>disponible</div>
+      </a>
+      <a href="#contact" class="sponsor-slot">
+        <div class="sponsor-slot-icon">🥉</div>
+        <div class="sponsor-slot-txt">Partenaire Bronze<br>disponible</div>
+      </a>
+    </div>
+
+    <!-- Ticker défilant -->
+    <div class="ticker-wrap rv">
+      <div class="ticker" id="ticker">
+        <!-- Ligne 1 (dupliquée pour l'animation infinie) -->
+        <span class="ticker-item"><span class="ticker-dot"></span>Devenez partenaire OpenSeaFamily</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>3 ans de visibilité internationale</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>40+ pays · 35 000 milles nautiques</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>Famille Bataillard · Bourg d'Oisans · Isère</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>contact@openseafamily.fr</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>YouTube · Instagram · TikTok · Facebook</span>
+        <!-- Ligne 2 (copie pour le défilement continu) -->
+        <span class="ticker-item"><span class="ticker-dot"></span>Devenez partenaire OpenSeaFamily</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>3 ans de visibilité internationale</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>40+ pays · 35 000 milles nautiques</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>Famille Bataillard · Bourg d'Oisans · Isère</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>contact@openseafamily.fr</span>
+        <span class="ticker-item"><span class="ticker-dot"></span>YouTube · Instagram · TikTok · Facebook</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="suivi-bg sf" id="suivi">
   <div class="si s">
     <div class="suivi-header rv">
       <div>
-        <span class="lbl">02 — Suivi en temps réel</span>
+        <span class="lbl">04 — Suivi en temps réel</span>
         <h2 class="ttl">Où en sommes-<em>nous ?</em></h2>
         <div class="rule"></div>
       </div>
@@ -460,7 +596,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
 <div class="famille-bg sf" id="famille">
   <div class="si s">
     <div class="rv">
-      <span class="lbl">03 — La Famille</span>
+      <span class="lbl">05 — La Famille</span>
       <h2 class="ttl">Quatre têtes,<br><em>un seul cap</em></h2>
       <div class="rule"></div>
     </div>
@@ -475,7 +611,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
 
 <!-- ══ ROUTE ══════════════════════════════════════ -->
 <section class="s" id="route">
-  <span class="lbl rv">04 — La Route</span>
+  <span class="lbl rv">06 — La Route</span>
   <h2 class="ttl rv">L'itinéraire<br><em>du grand large</em></h2>
   <div class="rule rv"></div>
   <div class="route-split">
@@ -496,7 +632,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
 <!-- ══ FINANCEMENT ════════════════════════════════ -->
 <div class="fin-bg sf" id="financement">
   <div class="si s">
-    <div class="rv"><span class="lbl">05 — Financement</span><h2 class="ttl">Aidez-nous à<br><em>lever l'ancre</em></h2><div class="rule"></div></div>
+    <div class="rv"><span class="lbl">07 — Financement</span><h2 class="ttl">Aidez-nous à<br><em>lever l'ancre</em></h2><div class="rule"></div></div>
     <p class="fin-intro rv">Ce voyage, nous ne pouvons pas le financer seuls — et nous n'en faisons pas un secret. Nous cherchons des partenaires, des sponsors, et le soutien de personnes qui croient que cette aventure a de la valeur : humaine, éducative, et inspirante.</p>
     <div class="fin-cards">
       <div class="fin-card rv"><div class="fin-icon">🤝</div><div class="fin-title">Partenariat Sponsor</div><p class="fin-desc">Votre marque associée à une aventure authentique. Visibilité sur le site, les réseaux et les médias tout au long des 3 ans.</p></div>
@@ -520,7 +656,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
 <!-- ══ SPONSORS ═══════════════════════════════════ -->
 <section id="sponsors">
   <div class="sponsor-center rv">
-    <span class="lbl">06 — Devenir Partenaire</span>
+    <span class="lbl">08 — Devenir Partenaire</span>
     <h2 class="ttl">Votre nom,<br><em>au bout du monde</em></h2>
     <p style="font-size:1rem;color:rgba(245,232,206,.64);max-width:520px;margin:18px auto 44px;line-height:1.85;">En nous rejoignant, vous n'achetez pas un espace publicitaire. Vous embarquez avec nous. Votre histoire devient la nôtre — pendant 3 ans, sur tous les océans.</p>
     <div class="tiers">
@@ -543,7 +679,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
 
 <!-- ══ FAQ ════════════════════════════════════════ -->
 <section class="s" id="faq">
-  <span class="lbl rv">07 — Questions fréquentes</span>
+  <span class="lbl rv">09 — Questions fréquentes</span>
   <h2 class="ttl rv">Vous vous<br><em>posez des questions ?</em></h2>
   <div class="rule rv"></div>
   <div class="faq-wrap rv">
@@ -561,7 +697,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
   <div class="si s">
     <div class="contact-grid">
       <div class="rl">
-        <span class="lbl">08 — Contact</span>
+        <span class="lbl">10 — Contact</span>
         <h2 class="ttl">Parlons-<em>nous</em></h2>
         <div class="rule"></div>
         <p>Sponsor, journaliste, famille navigatrice, ou simplement curieux ? Nous serions ravis d'échanger avec vous sur le projet OpenSeaFamily.</p>
