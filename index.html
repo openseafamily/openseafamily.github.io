@@ -825,28 +825,52 @@ function updateCounters(){
 updateCounters();setInterval(updateCounters,60000);
 
 // ── COMPTEUR VISITES GOATCOUNTER
-// GoatCounter expose un endpoint JSON public pour récupérer le total des visites
+// Utilise l'endpoint public /counter/{path}.json (sans authentification)
 async function fetchVisitCount(){
   try{
-    // ✏️ Remplacez "openseafamily" par votre code GoatCounter
-    const res=await fetch('https://openseafamily.goatcounter.com/counter/TOTAL.json');
-    if(!res.ok)throw new Error();
+    // ✏️ "openseafamily" = votre code GoatCounter
+    const res=await fetch('https://openseafamily.goatcounter.com/counter/.json');
+    if(!res.ok)throw new Error('HTTP '+res.status);
     const data=await res.json();
-    const count=data.count_unique||data.count||0;
-    // Formater le nombre : 1234 → 1 234
+    const count=data.count||0;
     const fmt=count.toLocaleString('fr-FR');
     ['visitCount','visitCount2','visitCountFooter'].forEach(id=>{
       const el=document.getElementById(id);
       if(el)el.textContent=fmt;
     });
   }catch(e){
-    // Si GoatCounter n'est pas encore configuré, afficher un placeholder
+    // Fallback : badge SVG GoatCounter en image (toujours public)
+    loadBadgeFallback();
+  }
+}
+
+function loadBadgeFallback(){
+  // Charge le compteur via le badge SVG public et en lit la valeur
+  const img=new Image();
+  img.src='https://openseafamily.goatcounter.com/counter/.svg?style=flat&color=ffffff';
+  img.onload=()=>{
+    // Le badge charge bien — on affiche un lien image à la place du chiffre
+    ['visitCount','visitCount2','visitCountFooter'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){
+        el.innerHTML='';
+        const i=document.createElement('img');
+        i.src=img.src;
+        i.alt='Compteur de visites';
+        i.style.cssText='height:18px;vertical-align:middle;filter:opacity(.7)';
+        el.appendChild(i);
+      }
+    });
+  };
+  img.onerror=()=>{
     ['visitCount','visitCount2','visitCountFooter'].forEach(id=>{
       const el=document.getElementById(id);
       if(el)el.textContent='—';
     });
-  }
+  };
 }
+
+fetchVisitCount();
 fetchVisitCount();
 
 // ── FAQ
