@@ -825,9 +825,8 @@ function updateCounters(){
 }
 updateCounters();setInterval(updateCounters,60000);
 
-// ── COMPTEUR VISITES — pas de fetch JS (CORS bloqué par GoatCounter)
-// Le badge SVG est injecté directement dans le DOM via les balises img du HTML
-fetchVisitCount();
+// ── COMPTEUR VISITES — badge SVG GoatCounter intégré directement dans le HTML
+
 
 // ── FAQ
 document.querySelectorAll('.faq-q').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.closest('.faq-item'),open=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!open)item.classList.add('open');});});
