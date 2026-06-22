@@ -35,9 +35,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,600&family=DM+Mono:wght@300;400;500&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-<!-- ✏️ GOATCOUNTER — Compteur de visites gratuit & RGPD -->
-<!-- Créez votre compte sur goatcounter.com et remplacez "openseafamily" par votre code -->
-<script data-goatcounter="https://openseafamily.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<!-- GoatCounter — analytics RGPD gratuit -->
+<!-- ✏️ Une fois votre compte créé sur goatcounter.com avec le code "openseafamily", décommentez cette ligne : -->
+<!-- <script data-goatcounter="https://openseafamily.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script> -->
 
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -307,20 +307,27 @@ nav.scrolled{background:rgba(11,18,32,.96);backdrop-filter:blur(20px);padding:14
 /* ── CONTACT ── */
 .contact-bg{background:linear-gradient(180deg,var(--ink) 0%,var(--deep) 100%);border-top:1px solid var(--border);}
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:68px;align-items:start;}
-.contact-info p{font-size:.95rem;color:rgba(245,232,206,.6);line-height:1.85;margin-bottom:28px;}
-.clinks{display:flex;flex-direction:column;gap:10px;}
-.clink{display:flex;align-items:center;gap:11px;text-decoration:none;font-size:.86rem;color:rgba(245,232,206,.65);transition:color .25s;padding-bottom:10px;border-bottom:1px solid var(--border);}
-.clink:last-child{border-bottom:none;}
-.clink:hover{color:var(--foam);}
+.contact-links-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.contact-card{border:1px solid var(--border);padding:18px 20px;background:var(--glass2);display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--cream);transition:border-color .3s,transform .3s,background .3s;}
+.contact-card:hover{border-color:rgba(141,212,240,.35);transform:translateX(4px);background:var(--glass);}
+.contact-card-icon{font-size:1.4rem;flex-shrink:0;}
+.contact-card-info{display:flex;flex-direction:column;gap:2px;}
+.contact-card-label{font-family:var(--ff-mono);font-size:.55rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--sky);}
+.contact-card-value{font-size:.88rem;color:rgba(245,232,206,.8);}
 .form{display:flex;flex-direction:column;gap:16px;}
 .fg{display:flex;flex-direction:column;gap:5px;}
 .flbl{font-family:var(--ff-mono);font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--sky);}
 .finp,.ftxt{background:var(--glass2);border:1px solid var(--border);padding:12px 14px;color:var(--cream);font-family:var(--ff-body);font-size:.92rem;outline:none;transition:border-color .25s,background .25s;}
 .finp:focus,.ftxt:focus{border-color:rgba(141,212,240,.45);background:var(--glass);}
 .finp::placeholder,.ftxt::placeholder{color:rgba(245,232,206,.18);}
-.ftxt{resize:vertical;min-height:100px;}
-.fsub{font-family:var(--ff-mono);font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink);background:var(--sun);border:none;padding:13px;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+.ftxt{resize:vertical;min-height:110px;}
+.fsub{font-family:var(--ff-mono);font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink);background:var(--sun);border:none;padding:13px;cursor:pointer;transition:transform .2s,box-shadow .2s;width:100%;}
 .fsub:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(240,168,64,.45);}
+.fsub:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.form-success{display:none;text-align:center;padding:32px;border:1px solid rgba(74,222,128,.3);background:rgba(74,222,128,.05);}
+.form-success .check{font-size:2.5rem;margin-bottom:12px;}
+.form-success p{font-family:var(--ff-mono);font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:rgba(74,222,128,.8);}
+@media(max-width:1000px){.contact-grid{grid-template-columns:1fr;gap:44px;}}
 
 /* ── FOOTER ── */
 footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;border-top:1px solid var(--border);}
@@ -412,7 +419,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
     <!-- Compteur visites dans le hero -->
     <div class="hero-counter">
       <div class="hero-counter-item">
-        <div class="hero-counter-num"><img src="https://openseafamily.goatcounter.com/counter/.svg?style=flat" alt="visites" style="height:32px;vertical-align:middle;filter:brightness(0) saturate(100%) invert(72%) sepia(80%) saturate(400%) hue-rotate(10deg) brightness(105%)"></div>
+        <div class="hero-counter-num"><img src="https://openseafamily.goatcounter.com/counter/.svg?style=flat&color=f0a840" alt="visites" style="height:28px;vertical-align:middle;"></div>
         <div class="hero-counter-lbl">Visites du site</div>
       </div>
       <div class="hero-counter-sep"></div>
@@ -435,7 +442,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
   <div class="counter-inner">
     <div class="cbar-item">
       <div class="cbar-dot"></div>
-      <div class="cbar-num"><img src="https://openseafamily.goatcounter.com/counter/.svg?style=flat" alt="visiteurs" style="height:28px;vertical-align:middle;filter:brightness(0) saturate(100%) invert(72%) sepia(80%) saturate(400%) hue-rotate(10deg) brightness(105%)"></div>
+      <div class="cbar-num"><img src="https://openseafamily.goatcounter.com/counter/.svg?style=flat&color=f0a840" alt="visiteurs" style="height:24px;vertical-align:middle;"></div>
       <div class="cbar-lbl">Visiteurs sur le site</div>
     </div>
     <div class="cbar-sep"></div>
@@ -751,25 +758,66 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
         <span class="lbl">10 — Contact</span>
         <h2 class="ttl">Parlons-<em>nous</em></h2>
         <div class="rule"></div>
-        <p>Sponsor, journaliste, famille navigatrice, ou simplement curieux ? Nous serions ravis d'échanger avec vous sur le projet OpenSeaFamily.</p>
-        <div class="clinks">
+        <p style="font-size:.95rem;color:rgba(245,232,206,.6);line-height:1.85;margin-bottom:28px;">Sponsor, journaliste, famille navigatrice, ou simplement curieux ? Nous répondons à tous les messages.</p>
+        <div class="contact-links-grid">
           <!-- ✏️ MODIFIEZ vos vrais liens ici -->
-          <a href="mailto:contact@openseafamily.fr" class="clink"><span>📧</span> contact@openseafamily.fr</a>
-          <a href="https://instagram.com/openseafamily" class="clink" target="_blank" rel="noopener"><span>📸</span> @OpenSeaFamily — Instagram</a>
-          <a href="https://youtube.com/@openseafamily" class="clink" target="_blank" rel="noopener"><span>▶️</span> OpenSeaFamily — YouTube</a>
-          <a href="https://tiktok.com/@openseafamily" class="clink" target="_blank" rel="noopener"><span>🎵</span> @OpenSeaFamily — TikTok</a>
-          <a href="https://facebook.com/openseafamily" class="clink" target="_blank" rel="noopener"><span>📘</span> OpenSeaFamily — Facebook</a>
-          <span class="clink"><span>📍</span> Bourg d'Oisans, Isère (38), France</span>
+          <a href="mailto:contact@openseafamily.fr" class="contact-card">
+            <div class="contact-card-icon">📧</div>
+            <div class="contact-card-info"><span class="contact-card-label">Email</span><span class="contact-card-value">contact@openseafamily.fr</span></div>
+          </a>
+          <a href="https://instagram.com/openseafamily" class="contact-card" target="_blank" rel="noopener">
+            <div class="contact-card-icon">📸</div>
+            <div class="contact-card-info"><span class="contact-card-label">Instagram</span><span class="contact-card-value">@OpenSeaFamily</span></div>
+          </a>
+          <a href="https://youtube.com/@openseafamily" class="contact-card" target="_blank" rel="noopener">
+            <div class="contact-card-icon">▶️</div>
+            <div class="contact-card-info"><span class="contact-card-label">YouTube</span><span class="contact-card-value">OpenSeaFamily</span></div>
+          </a>
+          <a href="https://tiktok.com/@openseafamily" class="contact-card" target="_blank" rel="noopener">
+            <div class="contact-card-icon">🎵</div>
+            <div class="contact-card-info"><span class="contact-card-label">TikTok</span><span class="contact-card-value">@OpenSeaFamily</span></div>
+          </a>
+          <a href="https://facebook.com/openseafamily" class="contact-card" target="_blank" rel="noopener">
+            <div class="contact-card-icon">📘</div>
+            <div class="contact-card-info"><span class="contact-card-label">Facebook</span><span class="contact-card-value">OpenSeaFamily</span></div>
+          </a>
+          <div class="contact-card" style="cursor:default;">
+            <div class="contact-card-icon">📍</div>
+            <div class="contact-card-info"><span class="contact-card-label">Localisation</span><span class="contact-card-value">Bourg d'Oisans, Isère (38)</span></div>
+          </div>
         </div>
       </div>
+
+      <!-- FORMULAIRE FORMSPREE — fonctionne réellement -->
       <div class="rr">
-        <form class="form" onsubmit="handleSubmit(event)">
-          <div class="fg"><label class="flbl" for="nom">Nom &amp; Prénom</label><input class="finp" id="nom" type="text" placeholder="Votre nom" required></div>
-          <div class="fg"><label class="flbl" for="email">Email</label><input class="finp" id="email" type="email" placeholder="votre@email.com" required></div>
-          <div class="fg"><label class="flbl" for="objet">Objet</label><input class="finp" id="objet" type="text" placeholder="Partenariat · Presse · Soutien · Autre"></div>
-          <div class="fg"><label class="flbl" for="message">Message</label><textarea class="ftxt" id="message" placeholder="Votre message..." required></textarea></div>
-          <button type="submit" class="fsub">Envoyer le message</button>
+        <form class="form" id="contactForm" action="https://formspree.io/f/xeewydlw" method="POST">
+          <div class="fg">
+            <label class="flbl" for="nom">Nom &amp; Prénom</label>
+            <input class="finp" id="nom" type="text" name="nom" placeholder="Votre nom" required>
+          </div>
+          <div class="fg">
+            <label class="flbl" for="email">Email</label>
+            <input class="finp" id="email" type="email" name="email" placeholder="votre@email.com" required>
+          </div>
+          <div class="fg">
+            <label class="flbl" for="objet">Objet</label>
+            <input class="finp" id="objet" type="text" name="objet" placeholder="Partenariat · Presse · Soutien · Autre">
+          </div>
+          <div class="fg">
+            <label class="flbl" for="message">Message</label>
+            <textarea class="ftxt" id="message" name="message" placeholder="Votre message..." required></textarea>
+          </div>
+          <!-- Champ anti-spam invisible -->
+          <input type="text" name="_gotcha" style="display:none">
+          <!-- Redirection après envoi (optionnel) -->
+          <input type="hidden" name="_subject" value="Nouveau message OpenSeaFamily ⚓">
+          <button type="submit" class="fsub" id="submitBtn">Envoyer le message</button>
         </form>
+        <!-- Message de succès affiché après envoi -->
+        <div class="form-success" id="formSuccess">
+          <div class="check">✅</div>
+          <p>Message envoyé avec succès !<br>Nous vous répondrons très vite ⚓</p>
+        </div>
       </div>
     </div>
   </div>
@@ -780,7 +828,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
   <div class="ft-logo">Open<span>Sea</span>Family</div>
   <div class="ft-visits">
     <div class="ft-visits-dot"></div>
-    <img src="https://openseafamily.goatcounter.com/counter/.svg?style=flat" alt="visiteurs" style="height:16px;vertical-align:middle;filter:brightness(0) saturate(100%) invert(60%) sepia(30%) saturate(300%) hue-rotate(180deg) brightness(120%) opacity(0.6)">
+    <img src="https://openseafamily.goatcounter.com/counter/.svg?style=flat&color=8dd4f0" alt="visiteurs" style="height:14px;vertical-align:middle;opacity:.7;">
     visiteurs
   </div>
   <div class="ft-copy">© 2026 Les Bataillard · Bourg d'Oisans · 2026–2029</div>
@@ -825,15 +873,40 @@ function updateCounters(){
 }
 updateCounters();setInterval(updateCounters,60000);
 
-// ── COMPTEUR VISITES — pas de fetch JS (CORS bloqué par GoatCounter)
-// Le badge SVG est injecté directement dans le DOM via les balises img du HTML
-fetchVisitCount();
+// ── COMPTEUR VISITES — badge SVG GoatCounter intégré directement dans le HTML
+
 
 // ── FAQ
 document.querySelectorAll('.faq-q').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.closest('.faq-item'),open=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!open)item.classList.add('open');});});
 
-// ── FORMULAIRE
-function handleSubmit(e){e.preventDefault();const btn=e.target.querySelector('.fsub');btn.textContent='Envoyé ⚓';btn.style.background='#4ade80';setTimeout(()=>{btn.textContent='Envoyer le message';btn.style.background='';e.target.reset();},3000);}
+// ── FORMULAIRE FORMSPREE
+const form=document.getElementById('contactForm');
+if(form){
+  form.addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    const btn=document.getElementById('submitBtn');
+    btn.textContent='Envoi en cours...';
+    btn.disabled=true;
+    try{
+      const res=await fetch(form.action,{
+        method:'POST',
+        body:new FormData(form),
+        headers:{Accept:'application/json'}
+      });
+      if(res.ok){
+        form.style.display='none';
+        document.getElementById('formSuccess').style.display='block';
+      } else {
+        btn.textContent='Erreur — réessayez';
+        btn.disabled=false;
+        btn.style.background='#ef4444';
+      }
+    }catch(err){
+      btn.textContent='Erreur réseau — réessayez';
+      btn.disabled=false;
+    }
+  });
+}
 </script>
 </body>
 </html>
