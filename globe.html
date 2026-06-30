@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenSeaFamily — Globe Tour du Monde</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;overflow:hidden;width:100vw;height:100vh;font-family:'Courier New',monospace;}
+
+#app{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;}
+canvas{display:block;cursor:grab;}
+canvas:active{cursor:grabbing;}
+
+.header{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(0,0,0,.9),transparent);}
+.logo{font-size:.85rem;letter-spacing:5px;text-transform:uppercase;color:#8dd4f0;}
+.logo span{color:#f0a840;}
+.subtitle{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(141,212,240,.4);}
+
+#tooltip{position:fixed;pointer-events:none;z-index:200;background:rgba(5,15,30,.95);border:1px solid rgba(240,168,64,.4);padding:10px 16px;opacity:0;transition:opacity .2s;min-width:180px;}
+.tt-step{font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:#f0a840;margin-bottom:3px;}
+.tt-name{font-size:.95rem;font-weight:700;color:#fff;font-family:'Georgia',serif;margin-bottom:2px;}
+.tt-desc{font-size:.68rem;color:rgba(141,212,240,.7);}
+
+#stop-list{position:fixed;left:20px;top:50%;transform:translateY(-50%);z-index:100;max-height:70vh;overflow-y:auto;scrollbar-width:none;}
+#stop-list::-webkit-scrollbar{display:none;}
+.stop-item{display:flex;align-items:center;gap:8px;padding:5px 10px;cursor:pointer;transition:all .2s;border-left:2px solid transparent;}
+.stop-item:hover{border-left-color:rgba(141,212,240,.4);}
+.stop-item.active{border-left-color:#f0a840;}
+.stop-item.active .si-dot{background:#f0a840;box-shadow:0 0 6px #f0a840;}
+.si-dot{width:6px;height:6px;border-radius:50%;background:rgba(141,212,240,.3);flex-shrink:0;}
+.si-n{font-size:.6rem;letter-spacing:.5px;color:rgba(245,232,206,.6);}
+.stop-item.active .si-n{color:#f0a840;}
+
+#stats-panel{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:12px;}
+.stat{background:rgba(5,15,30,.8);border:1px solid rgba(141,212,240,.12);padding:12px 16px;text-align:center;min-width:100px;}
+.stat-n{font-family:'Georgia',serif;font-size:1.5rem;font-weight:700;color:#f0a840;line-height:1;}
+.stat-l{font-size:.5rem;letter-spacing:2px;text-transform:uppercase;color:rgba(141,212,240,.4);margin-top:2px;}
+
+#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:12px;background:rgba(5,15,30,.9);border:1px solid rgba(141,212,240,.15);padding:10px 20px;}
+.c-btn{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream,#faf7f2);background:transparent;border:1px solid rgba(141,212,240,.2);padding:6px 14px;cursor:pointer;transition:all .2s;}
+.c-btn:hover,.c-btn.on{border-color:#8dd4f0;color:#8dd4f0;}
+.c-btn.on{background:rgba(141,212,240,.1);}
+.c-sep{width:1px;height:20px;background:rgba(141,212,240,.12);}
+.c-info{font-size:.58rem;letter-spacing:1.5px;color:rgba(141,212,240,.35);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.prog{width:100px;height:2px;background:rgba(255,255,255,.07);}
+.prog-f{height:100%;background:linear-gradient(to right,#1a5fa8,#f0a840);width:0%;transition:width .1s;}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="c"></canvas>
+</div>
+
+<div class="header">
+  <div class="logo">Open<span>Sea</span>Family</div>
+  <div class="subtitle">Tour du Monde à la Voile · Les Bataillard · Bourg d'Oisans</div>
+</div>
+
+<div id="tooltip"><div class="tt-step" id="tt-step"></div><div class="tt-name" id="tt-name"></div><div class="tt-desc" id="tt-desc"></div></div>
+
+<div id="stop-list"></div>
+
+<div id="stats-panel">
+  <div class="stat"><div class="stat-n">35K</div><div class="stat-l">Milles</div></div>
+  <div class="stat"><div class="stat-n" id="s-stops">0</div><div class="stat-l">Escales</div></div>
+  <div class="stat"><div class="stat-n">3</div><div class="stat-l">Années</div></div>
+  <div class="stat"><div class="stat-n">4</div><div class="stat-l">Marins</div></div>
+</div>
+
+<div id="controls">
+  <button class="c-btn on" id="b-play" onclick="togglePlay()">⏸ Pause</button>
+  <button class="c-btn" onclick="resetAnim()">↺ Rejouer</button>
+  <div class="c-sep"></div>
+  <button class="c-btn" onclick="setSpd(.5)">×½</button>
+  <button class="c-btn on" id="b-s1" onclick="setSpd(1)">×1</button>
+  <button class="c-btn" onclick="setSpd(2)">×2</button>
+  <div class="c-sep"></div>
+  <div class="prog"><div class="prog-f" id="pf"></div></div>
+  <div class="c-info" id="c-info">Prêt à naviguer...</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// ESCALES
+// ══════════════════════════════════════════════════
+const STOPS=[
+  {n:"Bourg d'Oisans", d:"France · Départ du rêve ⚓",           lat:45.05,lon:6.03},
+  {n:"Marseille",      d:"France · Méditerranée",                 lat:43.30,lon:5.37},
+  {n:"Barcelone",      d:"Espagne · Costa Brava",                 lat:41.38,lon:2.18},
+  {n:"Gibraltar",      d:"Détroit · Entrée dans l'Atlantique",    lat:36.14,lon:-5.35},
+  {n:"Lisbonne",       d:"Portugal · Dernière Europe",            lat:38.72,lon:-9.14},
+  {n:"Canaries",       d:"Espagne · Base de départ transatlantique",lat:28.29,lon:-15.63},
+  {n:"Cap-Vert",       d:"Archipel · Alizés favorables",          lat:16.00,lon:-24.00},
+  {n:"Martinique",     d:"Caraïbes · Première traversée 🎉",      lat:14.64,lon:-61.02},
+  {n:"Guadeloupe",     d:"Antilles · Mers turquoise",             lat:16.27,lon:-61.55},
+  {n:"Grenadines",     d:"Caraïbes · Mouillages de rêve",         lat:12.90,lon:-61.27},
+  {n:"Panama",         d:"Canal de Panama · Passage Pacifique",   lat:8.99,lon:-79.52},
+  {n:"Galápagos",      d:"Équateur · Faune unique 🐢",            lat:-0.95,lon:-90.97},
+  {n:"Marquises",      d:"Polynésie française · Premier atoll",   lat:-9.00,lon:-139.00},
+  {n:"Bora Bora",      d:"Polynésie · Lagon mythique 💎",         lat:-16.50,lon:-151.74},
+  {n:"Fidji",          d:"Pacifique Sud · Archipel volcanique",   lat:-17.71,lon:178.07},
+  {n:"Australie",      d:"Brisbane · Grande Barrière 🐠",         lat:-27.47,lon:153.03},
+  {n:"Bali",           d:"Indonésie · Passage vers l'Indien",     lat:-8.34,lon:115.09},
+  {n:"Maldives",       d:"Océan Indien · Atolls de corail 🪸",    lat:3.20,lon:73.22},
+  {n:"Madagascar",     d:"Afrique · Faune exceptionnelle",        lat:-20.00,lon:47.00},
+  {n:"La Réunion",     d:"France · Île volcanique 🌋",            lat:-21.11,lon:55.54},
+  {n:"Cap Town",       d:"Cap de Bonne-Espérance 🌍",             lat:-33.92,lon:18.42},
+  {n:"Açores",         d:"Portugal · Dernier archipel avant la France",lat:37.74,lon:-25.67},
+  {n:"Brest",          d:"France · Bretagne · Retour approche",   lat:48.39,lon:-4.49},
+  {n:"Bourg d'Oisans", d:"France · Mission accomplie ! ⚓🎉",     lat:45.05,lon:6.03},
+];
+
+// ══════════════════════════════════════════════════
+// CANVAS & STATE
+// ══════════════════════════════════════════════════
+const cv=document.getElementById('c');
+const cx=cv.getContext('2d');
+let W,H,R;
+let rotX=0.25,rotY=-0.4;
+let drag=false,lx=0,ly=0;
+let animT=0,spd=1,paused=false,autoR=true;
+let earthImg=null,earthLoaded=false;
+let offscreen=null,offCtx=null; // cache texture
+
+// ── Resize
+function resize(){
+  W=cv.width=window.innerWidth;
+  H=cv.height=window.innerHeight;
+  R=Math.min(W,H)*0.38;
+  if(earthLoaded)buildOffscreen();
+}
+window.addEventListener('resize',()=>{resize();});
+resize();
+
+// ══════════════════════════════════════════════════
+// TEXTURE TERRESTRE — tile OSM via canvas
+// Nous allons peindre la Terre à partir d'une image
+// de texture libre (Natural Earth / tile publique)
+// ══════════════════════════════════════════════════
+function loadEarth(){
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  // Texture haute résolution Natural Earth (domaine public)
+  img.src='https://unpkg.com/three-globe/example/img/earth-day.jpg';
+  img.onload=()=>{
+    earthImg=img; earthLoaded=true;
+    buildOffscreen();
+  };
+  img.onerror=()=>{
+    // fallback : texture alternative
+    const img2=new Image();
+    img2.crossOrigin='anonymous';
+    img2.src='https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json';
+    // Si aucune image ne charge, on utilise le mode polygone
+    earthLoaded=false;
+    startLoop();
+  };
+  // On lance quand même la boucle avec un timeout
+  setTimeout(()=>startLoop(),300);
+}
+
+// ── Construire l'offscreen avec la texture projetée sur la sphère
+function buildOffscreen(){
+  const size=Math.min(R*2+20,1024);
+  offscreen=document.createElement('canvas');
+  offscreen.width=offscreen.height=size;
+  offCtx=offscreen.getContext('2d');
+  renderEarthToOffscreen(size);
+}
+
+function renderEarthToOffscreen(size){
+  if(!offCtx||!earthImg)return;
+  offCtx.clearRect(0,0,size,size);
+  const cx2=size/2,cy2=size/2,r2=size/2-2;
+  // Pour chaque pixel de la sphère, trouver la coordonnée de texture
+  const idata=offCtx.createImageData(size,size);
+  const d=idata.data;
+  const tw=earthImg.naturalWidth,th=earthImg.naturalHeight;
+  // Canvas temporaire pour lire les pixels de la texture
+  const tc=document.createElement('canvas');
+  tc.width=tw;tc.height=th;
+  const tctx=tc.getContext('2d');
+  tctx.drawImage(earthImg,0,0);
+  const tdata=tctx.getImageData(0,0,tw,th).data;
+  for(let py=0;py<size;py++){
+    for(let px=0;px<size;px++){
+      const nx=(px-cx2)/r2, ny=(py-cy2)/r2;
+      const dist=nx*nx+ny*ny;
+      if(dist>1){continue;}
+      const nz=Math.sqrt(1-dist);
+      // normal sur la sphère (avant rotation)
+      // on veut la lon/lat de ce pixel
+      // sans rotation (sera appliquée via transform canvas)
+      const lat=Math.asin(ny)*180/Math.PI; // simplifié
+      // Lon = atan2(nx, nz)
+      const lon=Math.atan2(nx,nz)*180/Math.PI;
+      // UV texture équirectangulaire
+      const u=((lon+180)/360)*tw;
+      const v=((90-lat)/180)*th;
+      const tx=Math.min(Math.floor(u),tw-1);
+      const ty=Math.min(Math.floor(v),th-1);
+      const ti=(ty*tw+tx)*4;
+      const pi=(py*size+px)*4;
+      // Éclairage simple (diffus depuis le haut-gauche)
+      const light=Math.max(0.3, nz*0.7+0.3);
+      d[pi]=Math.min(255,tdata[ti]*light);
+      d[pi+1]=Math.min(255,tdata[ti+1]*light);
+      d[pi+2]=Math.min(255,tdata[ti+2]*light);
+      d[pi+3]=255;
+    }
+  }
+  offCtx.putImageData(idata,0,0);
+  // Clip circulaire
+  offCtx.globalCompositeOperation='destination-in';
+  offCtx.beginPath();offCtx.arc(cx2,cy2,r2,0,Math.PI*2);offCtx.fill();
+  offCtx.globalCompositeOperation='source-over';
+}
+
+// ══════════════════════════════════════════════════
+// PROJECTION 3D → 2D
+// ══════════════════════════════════════════════════
+function project(lat,lon){
+  const phi=(90-lat)*Math.PI/180;
+  const theta=(lon+180)*Math.PI/180;
+  let x=-Math.sin(phi)*Math.cos(theta);
+  let y=Math.cos(phi);
+  let z=Math.sin(phi)*Math.sin(theta);
+  const cy2=Math.cos(rotY),sy=Math.sin(rotY);
+  const x1=x*cy2-z*sy,z1=x*sy+z*cy2;
+  const cx2=Math.cos(rotX),sx=Math.sin(rotX);
+  const y2=y*cx2-z1*sx,z2=y*sx+z1*cx2;
+  return{x:W/2+x1*R,y:H/2-y2*R,z:z2,v:z2>-0.02};
+}
+
+// ══════════════════════════════════════════════════
+// DESSIN
+// ══════════════════════════════════════════════════
+function drawScene(){
+  cx.clearRect(0,0,W,H);
+
+  // ── Globe de base (fond océan si pas de texture)
+  if(!earthLoaded||!offscreen){
+    const g=cx.createRadialGradient(W/2-R*.3,H/2-R*.3,R*.05,W/2,H/2,R);
+    g.addColorStop(0,'#1e6bb0');g.addColorStop(.6,'#0a2d5e');g.addColorStop(1,'#030f22');
+    cx.beginPath();cx.arc(W/2,H/2,R,0,Math.PI*2);cx.fillStyle=g;cx.fill();
+  } else {
+    // ── Texture Earth : rotation via transform canvas
+    cx.save();
+    cx.translate(W/2,H/2);
+    // On applique la rotation comme un decalage de texture horizontal
+    // en re-dessinant l'offscreen avec un offset de longitude
+    const size=offscreen.width;
+    // Calcul du décalage en pixels selon rotY
+    const lonOffset=(rotY/(Math.PI*2))*size;
+    // On dessine 2x pour couvrir le wrap
+    cx.drawImage(offscreen,-size/2+lonOffset,-size/2);
+    cx.drawImage(offscreen,-size/2+lonOffset-size,-size/2);
+    cx.drawImage(offscreen,-size/2+lonOffset+size,-size/2);
+    cx.restore();
+    // Clip circulaire
+    cx.save();
+    cx.globalCompositeOperation='destination-in';
+    cx.beginPath();cx.arc(W/2,H/2,R,0,Math.PI*2);cx.fill();
+    cx.restore();
+    cx.globalCompositeOperation='source-over';
+  }
+
+  // ── Atmosphère / lueur bleue
+  const atmo=cx.createRadialGradient(W/2,H/2,R*.88,W/2,H/2,R*1.18);
+  atmo.addColorStop(0,'rgba(59,155,214,0.25)');
+  atmo.addColorStop(.5,'rgba(59,155,214,0.08)');
+  atmo.addColorStop(1,'transparent');
+  cx.beginPath();cx.arc(W/2,H/2,R*1.18,0,Math.PI*2);cx.fillStyle=atmo;cx.fill();
+
+  // ── Bordure globe
+  cx.beginPath();cx.arc(W/2,H/2,R,0,Math.PI*2);
+  cx.strokeStyle='rgba(141,212,240,0.3)';cx.lineWidth=1.5;cx.stroke();
+
+  // ── Grille (légère)
+  cx.strokeStyle='rgba(255,255,255,0.07)';cx.lineWidth=0.5;
+  for(let lat=-80;lat<=80;lat+=20){
+    cx.beginPath();let f=true;
+    for(let lon=-180;lon<=180;lon+=3){
+      const p=project(lat,lon);if(!p.v){f=true;continue;}
+      f?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);f=false;
+    }cx.stroke();
+  }
+  for(let lon=-180;lon<180;lon+=30){
+    cx.beginPath();let f=true;
+    for(let lat=-85;lat<=85;lat+=3){
+      const p=project(lat,lon);if(!p.v){f=true;continue;}
+      f?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);f=false;
+    }cx.stroke();
+  }
+  // Équateur
+  cx.strokeStyle='rgba(255,255,255,0.15)';cx.lineWidth=1;
+  cx.beginPath();let f=true;
+  for(let lon=-180;lon<=180;lon+=2){
+    const p=project(0,lon);if(!p.v){f=true;continue;}
+    f?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);f=false;
+  }cx.stroke();
+
+  // ── Route fantôme
+  cx.setLineDash([3,8]);cx.strokeStyle='rgba(240,168,64,0.2)';cx.lineWidth=1.5;
+  cx.beginPath();f=true;
+  for(const s of STOPS){const p=project(s.lat,s.lon);if(!p.v){f=true;continue;}f?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);f=false;}
+  cx.stroke();cx.setLineDash([]);
+
+  // ── Route animée dorée
+  const total=STOPS.length-1,drawn=animT*total;
+  cx.strokeStyle='#f0a840';cx.lineWidth=2.5;
+  cx.shadowColor='rgba(240,168,64,0.8)';cx.shadowBlur=10;
+  cx.beginPath();f=true;
+  for(let i=0;i<=Math.floor(drawn);i++){
+    const p=project(STOPS[i].lat,STOPS[i].lon);if(!p.v){f=true;continue;}
+    f?cx.moveTo(p.x,p.y):cx.lineTo(p.x,p.y);f=false;
+  }
+  const idx=Math.floor(drawn);
+  if(idx<total){
+    const fr=drawn-idx,a=STOPS[idx],b=STOPS[idx+1];
+    const p=project(a.lat+(b.lat-a.lat)*fr,a.lon+(b.lon-a.lon)*fr);
+    if(p.v)cx.lineTo(p.x,p.y);
+  }
+  cx.stroke();cx.shadowBlur=0;
+
+  // ── Points d'escale
+  STOPS.forEach((s,i)=>{
+    if(i>drawn+0.5)return;
+    const p=project(s.lat,s.lon);if(!p.v)return;
+    const cur=Math.abs(i-drawn)<0.9;
+    if(cur){
+      const h=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,24);
+      h.addColorStop(0,'rgba(240,168,64,0.5)');h.addColorStop(1,'transparent');
+      cx.beginPath();cx.arc(p.x,p.y,24,0,Math.PI*2);cx.fillStyle=h;cx.fill();
+    }
+    cx.beginPath();cx.arc(p.x,p.y,cur?5.5:3.5,0,Math.PI*2);
+    cx.fillStyle=cur?'#fff':(i===0||i===STOPS.length-1?'#f0a840':'rgba(141,212,240,0.85)');
+    if(cur){cx.shadowColor='rgba(255,255,255,0.9)';cx.shadowBlur=10;}
+    cx.fill();cx.shadowBlur=0;
+    // Label
+    if(cur||(i===0||i===STOPS.length-1)){
+      cx.fillStyle=cur?'#fff':'rgba(240,168,64,0.9)';
+      cx.font=`${cur?'bold ':''} ${cur?11:9}px Courier New`;
+      cx.textAlign=p.x>W/2?'right':'left';
+      const ox=p.x>W/2?-10:10;
+      cx.fillText(s.n,p.x+ox,p.y-9);
+    }
+  });
+
+  // ── Voilier animé
+  const a2=STOPS[Math.min(idx,total-1)],b2=STOPS[Math.min(idx+1,total)];
+  const fr2=(drawn-idx);
+  const blat=a2.lat+(b2.lat-a2.lat)*fr2,blon=a2.lon+(b2.lon-a2.lon)*fr2;
+  const bp=project(blat,blon);
+  if(bp.v){
+    cx.font='20px serif';cx.textAlign='center';
+    cx.shadowColor='rgba(255,255,255,0.7)';cx.shadowBlur=14;
+    cx.fillText('⛵',bp.x,bp.y-5);cx.shadowBlur=0;
+  }
+
+  // ── Reflet
+  const sh=cx.createRadialGradient(W/2-R*.4,H/2-R*.4,0,W/2,H/2,R);
+  sh.addColorStop(0,'rgba(255,255,255,0.07)');sh.addColorStop(.5,'transparent');
+  cx.beginPath();cx.arc(W/2,H/2,R,0,Math.PI*2);cx.fillStyle=sh;cx.fill();
+}
+
+// ══════════════════════════════════════════════════
+// BOUCLE D'ANIMATION
+// ══════════════════════════════════════════════════
+let lt=0;
+function loop(ts){
+  requestAnimationFrame(loop);
+  const dt=Math.min((ts-lt)/1000,.05);lt=ts;
+  if(!paused){
+    animT=Math.min(animT+dt*.01*spd,1);
+    if(autoR&&!drag)rotY+=dt*.025;
+  }
+  drawScene();
+  // UI
+  const total=STOPS.length-1;
+  const idx=Math.min(Math.floor(animT*total),total-1);
+  document.getElementById('pf').style.width=(animT*100)+'%';
+  document.getElementById('s-stops').textContent=idx+1;
+  document.getElementById('c-info').textContent=STOPS[idx].n;
+  document.querySelectorAll('.stop-item').forEach((el,i)=>el.classList.toggle('active',i===idx));
+  if(animT>=1&&!paused){paused=true;document.getElementById('b-play').textContent='▶ Rejouer';}
+}
+
+// ══════════════════════════════════════════════════
+// INTERACTIONS
+// ══════════════════════════════════════════════════
+cv.addEventListener('mousedown',e=>{drag=true;lx=e.clientX;ly=e.clientY;autoR=false;});
+cv.addEventListener('mousemove',e=>{
+  if(drag){rotY+=(e.clientX-lx)*.006;rotX+=(e.clientY-ly)*.006;rotX=Math.max(-1.4,Math.min(1.4,rotX));lx=e.clientX;ly=e.clientY;}
+  // Tooltip
+  const total=STOPS.length-1,drawn=animT*total;
+  let found=false;
+  STOPS.forEach((s,i)=>{
+    if(i>drawn+.5)return;
+    const p=project(s.lat,s.lon);if(!p.v)return;
+    const dx=e.clientX-p.x,dy=e.clientY-p.y;
+    if(dx*dx+dy*dy<144){
+      const tt=document.getElementById('tooltip');
+      document.getElementById('tt-step').textContent=`Escale ${i+1} / ${STOPS.length}`;
+      document.getElementById('tt-name').textContent=s.n;
+      document.getElementById('tt-desc').textContent=s.d;
+      tt.style.left=(e.clientX+16)+'px';tt.style.top=(e.clientY-20)+'px';tt.style.opacity='1';found=true;
+    }
+  });
+  if(!found)document.getElementById('tooltip').style.opacity='0';
+});
+cv.addEventListener('mouseup',()=>drag=false);
+cv.addEventListener('mouseleave',()=>{drag=false;document.getElementById('tooltip').style.opacity='0';});
+cv.addEventListener('touchstart',e=>{drag=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;autoR=false;},{passive:true});
+cv.addEventListener('touchmove',e=>{
+  if(!drag)return;
+  rotY+=(e.touches[0].clientX-lx)*.006;rotX+=(e.touches[0].clientY-ly)*.006;
+  rotX=Math.max(-1.4,Math.min(1.4,rotX));lx=e.touches[0].clientX;ly=e.touches[0].clientY;
+},{passive:true});
+cv.addEventListener('touchend',()=>drag=false);
+
+// Contrôles
+function togglePlay(){if(animT>=1){resetAnim();return;}paused=!paused;const b=document.getElementById('b-play');b.textContent=paused?'▶ Play':'⏸ Pause';b.classList.toggle('on',!paused);}
+function resetAnim(){animT=0;paused=false;rotY=-0.4;rotX=0.25;autoR=true;document.getElementById('b-play').textContent='⏸ Pause';document.getElementById('b-play').classList.add('on');}
+let curSpd=1;
+function setSpd(s){curSpd=spd=s;['b-s1'].forEach(id=>document.getElementById(id)&&document.getElementById(id).classList.remove('on'));document.querySelectorAll('.c-btn').forEach(b=>{if(b.textContent.includes('×'))b.classList.remove('on');});event&&event.target&&event.target.classList.add('on');}
+
+// Liste escales
+const sl=document.getElementById('stop-list');
+STOPS.forEach((s,i)=>{
+  const d=document.createElement('div');d.className='stop-item';
+  d.onclick=()=>{animT=i/(STOPS.length-1);rotY=-s.lon*Math.PI/180-Math.PI/2;rotX=s.lat*Math.PI/180*.3;};
+  d.innerHTML=`<div class="si-dot"></div><div class="si-n">${s.n}</div>`;
+  sl.appendChild(d);
+});
+
+// ══════════════════════════════════════════════════
+// LANCEMENT
+// ══════════════════════════════════════════════════
+loadEarth();
+</script>
+</body>
+</html>
