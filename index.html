@@ -416,55 +416,10 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
       <a href="#video" class="btn-sun">Voir la vidéo</a>
       <a href="#financement" class="btn-ghost">Nous soutenir</a>
     </div>
-    <!-- Compteur visites dans le hero -->
-    <div class="hero-counter">
-      <div class="hero-counter-item">
-        <div class="hero-counter-num" id="visitCount">—</div>
-        <div class="hero-counter-lbl">Visites du site</div>
-      </div>
-      <div class="hero-counter-sep"></div>
-      <div class="hero-counter-item">
-        <div class="hero-counter-num" id="joursCountHero">0</div>
-        <div class="hero-counter-lbl">Jours de préparation</div>
-      </div>
-      <div class="hero-counter-sep"></div>
-      <div class="hero-counter-item">
-        <div class="hero-counter-num" id="daysLeftHero">—</div>
-        <div class="hero-counter-lbl">Jours avant départ</div>
-      </div>
-    </div>
   </div>
   <div class="scroll-cue"><div class="scroll-line"></div><span>Défiler</span></div>
 </section>
 
-<!-- ══ BARRE COMPTEUR VISITES ══════════════════ -->
-<div class="counter-bar">
-  <div class="counter-inner">
-    <div class="cbar-item">
-      <div class="cbar-dot"></div>
-      <div class="cbar-num" id="visitCount2">—</div>
-      <div class="cbar-lbl">Visiteurs sur le site</div>
-    </div>
-    <div class="cbar-sep"></div>
-    <div class="cbar-item">
-      <div class="cbar-dot" style="background:#8dd4f0;box-shadow:0 0 8px #8dd4f0;"></div>
-      <div class="cbar-num" id="joursCountBar">0</div>
-      <div class="cbar-lbl">Jours de préparation</div>
-    </div>
-    <div class="cbar-sep"></div>
-    <div class="cbar-item">
-      <div class="cbar-dot" style="background:var(--sun);box-shadow:0 0 8px var(--sun);animation:none;"></div>
-      <div class="cbar-num">2026</div>
-      <div class="cbar-lbl">Année de lancement</div>
-    </div>
-    <div class="cbar-sep"></div>
-    <div class="cbar-item">
-      <div class="cbar-dot" style="background:#c084fc;box-shadow:0 0 8px #c084fc;animation:none;"></div>
-      <div class="cbar-num">0</div>
-      <div class="cbar-lbl">Partenaires signés</div>
-    </div>
-  </div>
-</div>
 
 <!-- ══ PROJET ════════════════════════════════════ -->
 <section class="s" id="projet">
@@ -681,8 +636,16 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
       <div class="stop"><div class="stop-tag">Retour · Année 3</div><div class="stop-name">Océan Indien → Afrique du Sud → Açores → France</div><p class="stop-desc">Le cap de Bonne-Espérance. La boucle se referme sur Bourg d'Oisans.</p></div>
     </div>
     <div class="rr">
-      <div class="map-ph"><div class="map-globe">🗺️</div><p class="map-txt">Carte interactive<br>disponible au départ</p></div>
-      <div class="route-note"><p>📍 <strong>Itinéraire en cours de définition.</strong><br>La mer décide souvent à notre place — et c'est ça qui est beau. Suivez notre préparation ici et sur nos réseaux sociaux.</p></div>
+      <div style="position:relative;width:100%;aspect-ratio:4/3;border:1px solid var(--border);overflow:hidden;background:var(--glass2);">
+        <iframe
+          src="https://openseafamily.github.io/globe.html"
+          title="OpenSeaFamily — Globe Tour du Monde"
+          style="position:absolute;inset:0;width:100%;height:100%;border:none;"
+          loading="lazy"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="route-note"><p>🌍 <strong>Globe interactif.</strong><br>Tournez le globe en glissant, cliquez sur une escale, ajustez la vitesse. La route dorée trace votre aventure en temps réel.</p></div>
     </div>
   </div>
 </section>
@@ -704,7 +667,7 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
       <div class="bar-row"><div class="bar-lbl"><span>Formation &amp; préparation</span><span>6 000 €</span></div><div class="bar-track"><div class="bar-fill" data-width="3"></div></div></div>
       <div class="budget-ft">
         <div class="bft"><div class="num">179 000 €</div><div class="lbl">Budget minimum</div></div>
-        <div class="bft"><div class="num">100 €</div><div class="lbl">Collecté à ce jour</div></div>
+        <div class="bft"><div class="num">0 €</div><div class="lbl">Collecté à ce jour</div></div>
         <div class="bft"><div class="num">2026</div><div class="lbl">En préparation</div></div>
       </div>
     </div>
@@ -826,11 +789,6 @@ footer{max-width:1240px;margin:0 auto;padding:34px 60px;display:flex;align-items
 <!-- ══ FOOTER ═════════════════════════════════════ -->
 <footer>
   <div class="ft-logo">Open<span>Sea</span>Family</div>
-  <div class="ft-visits">
-    <div class="ft-visits-dot"></div>
-    <img src="https://openseafamily.goatcounter.com/counter/.svg?style=flat&color=8dd4f0" alt="visiteurs" style="height:14px;vertical-align:middle;opacity:.7;">
-    visiteurs
-  </div>
   <div class="ft-copy">© 2026 Les Bataillard · Bourg d'Oisans · 2026–2029</div>
   <div class="socials">
     <a href="https://instagram.com/openseafamily" class="soc" target="_blank" rel="noopener" aria-label="Instagram">📸</a>
@@ -868,13 +826,10 @@ function updateCounters(){
   const days=Math.max(0,Math.floor((now-launch)/86400000));
   const dep=new Date(launch.getTime()+900*86400000);
   const left=Math.max(0,Math.floor((dep-now)/86400000));
-  ['joursCount','joursCountHero','joursCountBar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=days;});
-  ['daysLeft','daysLeftHero'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='~'+left;});
+  const jEl=document.getElementById('joursCount');if(jEl)jEl.textContent=days;
+  const dEl=document.getElementById('daysLeft');if(dEl)dEl.textContent='~'+left;
 }
 updateCounters();setInterval(updateCounters,60000);
-
-// ── COMPTEUR VISITES — badge SVG GoatCounter intégré directement dans le HTML
-
 
 // ── FAQ
 document.querySelectorAll('.faq-q').forEach(btn=>{btn.addEventListener('click',()=>{const item=btn.closest('.faq-item'),open=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!open)item.classList.add('open');});});
