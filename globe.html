@@ -400,7 +400,7 @@ STOPS.forEach((s,i)=>{
 resize();
 buildProjection();
 
-d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world=>{
+d3.json("./countries-110m.json").then(world=>{
   worldLand=topojson.feature(world,world.objects.land);
   worldBorders=topojson.mesh(world,world.objects.countries,(a,b)=>a!==b);
   document.getElementById('loading').classList.add('hidden');
