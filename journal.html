@@ -357,8 +357,8 @@ Utilisez **mot** pour mettre en gras, et &quot;texte&quot; pour une citation."><
 // CONFIGURATION JSONBIN
 // ✏️ Collez vos valeurs ici après inscription sur jsonbin.io
 // ══════════════════════════════════════════════════
-const JSONBIN_ID  = '6a7ab90af5f4af5e2905ab8e';   // Ex: 65a3bc1234...
-const JSONBIN_KEY = '2a$10$xYqKfsKcOTac4gR8pfug1e.livPWzIO5f9D3tp/bwM8kowLmIGe2u ';  // Ex: $2b$10$abc...
+const JSONBIN_ID  = 'VOTRE_BIN_ID';   // Ex: 65a3bc1234...
+const JSONBIN_KEY = 'VOTRE_API_KEY';  // Ex: $2b$10$abc...
 const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
 const CONFIGURED  = JSONBIN_ID !== 'VOTRE_BIN_ID';
 
@@ -573,9 +573,9 @@ function isAuthenticated(){
   return sessionStorage.getItem(SESSION_KEY)==='true';
 }
 
-function openAdminOrAskPassword(){
+async function openAdminOrAskPassword(){
   if(isAuthenticated()){
-    openAdmin();
+    await openAdmin();
   } else {
     document.getElementById('pwd-modal').classList.add('show');
     document.getElementById('pwd-input').value='';
@@ -585,12 +585,12 @@ function openAdminOrAskPassword(){
   }
 }
 
-function checkPassword(){
+async function checkPassword(){
   const val=document.getElementById('pwd-input').value;
   if(val===ADMIN_PASSWORD){
     sessionStorage.setItem(SESSION_KEY,'true');
     closePwdModal();
-    openAdmin();
+    await openAdmin();
   } else {
     document.getElementById('pwd-error').textContent='Mot de passe incorrect';
     document.getElementById('pwd-icon').textContent='🔒';
@@ -608,7 +608,7 @@ function closePwdModal(){
   document.getElementById('pwd-modal').classList.remove('show');
 }
 
-function openAdmin(){
+async function openAdmin(){
   editingId=null;
   clearForm();
   document.getElementById('admin-title-txt').textContent='Nouvelle entrée';
