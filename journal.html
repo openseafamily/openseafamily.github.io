@@ -354,30 +354,92 @@ Utilisez **mot** pour mettre en gras, et &quot;texte&quot; pour une citation."><
 
 <script>
 // ══════════════════════════════════════════════════
-// DONNÉES — STOCKAGE LOCAL
+// CONFIGURATION JSONBIN
+// ✏️ Collez vos valeurs ici après inscription sur jsonbin.io
 // ══════════════════════════════════════════════════
-const STORAGE_KEY = 'osf_journal_v1';
+const JSONBIN_ID  = 'VOTRE_BIN_ID';   // Ex: 65a3bc1234...
+const JSONBIN_KEY = 'VOTRE_API_KEY';  // Ex: $2b$10$abc...
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+const CONFIGURED  = JSONBIN_ID !== 'VOTRE_BIN_ID';
+
 const PHASE_LABELS = {prep:'Préparation',voile:'En mer',escale:'Escale',traversee:'Traversée',famille:'Famille'};
 const PHASE_ICONS  = {prep:'🔵',voile:'🟢',escale:'🟡',traversee:'🟣',famille:'🔴'};
 const PHASE_EMOJIS = {prep:'📝',voile:'⛵',escale:'🌴',traversee:'🌊',famille:'👨‍👩‍👧‍👧'};
 
-function loadEntries(){
-  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}
-  catch{return [];}
-}
-function saveEntries(entries){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(entries));
+// Cache local pour éviter trop de requêtes
+let _cache = null;
+
+async function loadEntries(){
+  if(_cache) return _cache;
+  if(!CONFIGURED){
+    const local = localStorage.getItem('osf_demo');
+    _cache = local ? JSON.parse(local) : getDemoEntries();
+    return _cache;
+  }
+  try{
+    showLoader(true);
+    const res = await fetch(`${JSONBIN_URL}/latest`,{
+      headers:{'X-Master-Key':JSONBIN_KEY,'X-Bin-Meta':'false'}
+    });
+    if(!res.ok) throw new Error('err');
+    const data = await res.json();
+    _cache = Array.isArray(data) ? data : [];
+    return _cache;
+  }catch(e){
+    showToast('⚠️ Erreur chargement — mode local');
+    const fb = localStorage.getItem('osf_fallback');
+    _cache = fb ? JSON.parse(fb) : getDemoEntries();
+    return _cache;
+  }finally{showLoader(false);}
 }
 
+async function saveEntries(entries){
+  _cache = entries;
+  if(!CONFIGURED){
+    localStorage.setItem('osf_demo', JSON.stringify(entries));
+    return;
+  }
+  localStorage.setItem('osf_fallback', JSON.stringify(entries));
+  try{
+    await fetch(JSONBIN_URL,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY,'X-Bin-Versioning':'false'},
+      body: JSON.stringify(entries)
+    });
+  }catch(e){ showToast('⚠️ Sauvegarde distante échouée — sauvegardé localement'); }
+}
+
+function showLoader(show){
+  let el=document.getElementById('osf-loader');
+  if(!el){el=document.createElement('div');el.id='osf-loader';
+    el.style.cssText='position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,#8dd4f0,#f0a840);z-index:9999;transition:opacity .4s;';
+    document.body.appendChild(el);}
+  el.style.opacity=show?'1':'0';
+}
+
+function getDemoEntries(){return[
+  {id:'d1',date:'2026-05-28',title:"C'est parti — OpenSeaFamily est lancé !",phase:'prep',location:"Bourg d'Oisans",author:'La famille',excerpt:"Le jour où tout a commencé.",content:"C'est fait. Après des semaines de réflexion, on a décidé.\n\nNous partons. En voilier. Autour du monde. Pendant 3 ans.\n\nLola et Iris ont sauté partout quand on leur a annoncé.\n\nCe journal commence aujourd'hui.",tags:['lancement','famille','projet'],weather:'',miles:0,featured:true},
+  {id:'d2',date:'2026-06-10',title:"Premier contact avec l'eau",phase:'prep',location:'Lac du Bourget (73)',author:'Mickaël',excerpt:"Première leçon de voile. On a failli chavirer.",content:"Aujourd'hui était un grand jour.\n\n**Zéro expérience. Zéro vocabulaire. Zéro réflexe.**\n\nOn a failli chavirer. Lola a rigolé. On rentre avec une envie folle de recommencer.",tags:['voile','formation'],weather:'Vent 10 nœuds SO',miles:0},
+];}
+
 // Entrées de démonstration
-function seedDemo(){
-  if(loadEntries().length>0)return;
+async function seedDemo(){
+  if(!CONFIGURED){
+    if(!localStorage.getItem('osf_demo'))
+      localStorage.setItem('osf_demo', JSON.stringify(getDemoEntries()));
+    return;
+  }
+  // Si JSONBin configuré et vide, on ne seed pas
+}
+
+// Ancienne seedDemo sync — wrapper async pour compatibilité
+function seedDemoSync(){
   const demo=[
     {id:'d1',date:'2026-05-28',title:"C'est parti — OpenSeaFamily est lancé !",phase:'prep',location:"Bourg d'Oisans",author:'La famille',excerpt:"Le jour où tout a commencé. Nous avons pris la décision la plus folle et la plus belle de notre vie.",content:"C'est fait. Après des semaines de réflexion, de doutes, de discussions à table jusqu'à tard le soir, on a décidé.\n\nNous partons. En voilier. Autour du monde. Pendant 3 ans.\n\nLola et Iris ont sauté partout quand on leur a annoncé. Iris a aussitôt demandé si elle pourrait collecter des coquillages dans tous les pays. Lola a dit qu'elle voulait photographier chaque escale.\n\nOn ne sait pas encore nager dans l'océan. On n'a jamais pris le volant d'un voilier. Mais on a décidé que ce n'était pas une raison de ne pas partir.\n\nCe journal commence aujourd'hui. Il racontera tout — les peurs, les joies, les progrès, les ratés. L'aventure commence maintenant, ici, à Bourg d'Oisans, au pied de l'Alpe d'Huez.",tags:['lancement','famille','projet'],weather:'',miles:0,featured:true},
     {id:'d2',date:'2026-06-10',title:"Premier contact avec l'eau — Lac du Bourget",phase:'prep',location:'Lac du Bourget (73)',author:'Mickaël',excerpt:"Première leçon de voile pour toute la famille. On a tout découvert — et on a failli chavirer.",content:"Aujourd'hui était un grand jour.\n\nOn a pris la route à 6h du matin pour rejoindre le lac du Bourget. Deux heures de route, les filles encore ensommeillées sur la banquette arrière.\n\nLe moniteur, Rémi, nous a accueillis avec un sourire bienveillant. Il a vite compris qu'on partait vraiment de zéro. **Zéro expérience. Zéro vocabulaire. Zéro réflexe.**\n\nOn a appris les noms des voiles, de la bôme, du safran. Iris répétait tout à voix haute comme une formule magique.\n\n\"Ecoute, écoute, écoute !\" criait Rémi quand on laissait la voile fasseyer.\n\nEt puis on a failli chavirer. Un coup de vent, une mauvaise réaction de ma part, et le bateau a gité à 45 degrés. Sondes a serré Iris dans ses bras. Lola a rigolé.\n\nOn rentre épuisés, bronzés, et avec une envie folle de recommencer.",tags:['voile','formation','lac'],weather:'Vent 10 nœuds SO, ensoleillé',miles:0},
     {id:'d3',date:'2026-07-02',title:"Le site est en ligne — bonjour le monde !",phase:'prep',location:"Bourg d'Oisans",author:'Sondes',excerpt:"Après des heures de travail, notre site openseafamily.fr est enfin accessible. Une étape importante.",content:"On l'a fait !\n\nopenseafamily.fr est en ligne depuis ce matin. J'ai passé des semaines à travailler sur ce projet, et voir le site tourner pour la première fois... c'est une émotion particulière.\n\nLes filles ont voulu voir leur photo sur internet. Iris a dit que c'était *\"magique d'être dans l'ordinateur de tout le monde\"*.\n\nOn a aussi lancé notre compte Instagram. Premier post : une photo de nous quatre devant les montagnes de l'Oisans, avec la légende *\"Le voyage commence ici\"*.\n\n**Les premiers messages de soutien sont arrivés dans la journée.** Des inconnus qui nous disent qu'ils suivent notre aventure avec émotion. C'est exactement pour ça qu'on fait ça.",tags:['site','communication','réseaux'],weather:'',miles:0},
   ];
-  saveEntries(demo);
+  // (démo via getDemoEntries)
 }
 
 // ══════════════════════════════════════════════════
@@ -389,8 +451,8 @@ let editingId=null, selectedPhase='prep';
 // ══════════════════════════════════════════════════
 // RENDU
 // ══════════════════════════════════════════════════
-function getFiltered(){
-  let entries=[...loadEntries()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+async function getFiltered(){
+  let entries=[...(await loadEntries())].sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(currentFilter!=='all')entries=entries.filter(e=>e.phase===currentFilter);
   if(currentSearch)entries=entries.filter(e=>
     e.title.toLowerCase().includes(currentSearch)||
@@ -401,11 +463,11 @@ function getFiltered(){
   return entries;
 }
 
-function renderGrid(){
-  const entries=getFiltered();
+async function renderGrid(){
+  const entries=await getFiltered();
   const grid=document.getElementById('grid');
   // Stats
-  const all=loadEntries();
+  const all=await loadEntries();
   document.getElementById('stat-count').textContent=all.length;
   const launch=new Date('2026-05-28');
   document.getElementById('stat-days').textContent=Math.max(0,Math.floor((new Date()-launch)/86400000));
@@ -458,8 +520,8 @@ function parseContent(txt){
 // ══════════════════════════════════════════════════
 // VUE DÉTAIL
 // ══════════════════════════════════════════════════
-function openDetail(idx){
-  const entries=getFiltered();
+async function openDetail(idx){
+  const entries=await getFiltered();
   currentDetailIdx=idx;
   const e=entries[idx];
   if(!e)return;
@@ -484,9 +546,7 @@ function closeDetail(){
   document.getElementById('detail-view').style.display='none';
   document.body.style.overflow='';
 }
-function navigateDetail(dir){
-  openDetail(currentDetailIdx+dir);
-}
+function navigateDetail(dir){ openDetail(currentDetailIdx+dir); }
 
 // ══════════════════════════════════════════════════
 // FILTRES
@@ -554,7 +614,7 @@ function openAdmin(){
   document.getElementById('admin-title-txt').textContent='Nouvelle entrée';
   document.getElementById('admin-panel').style.display='block';
   document.body.style.overflow='hidden';
-  renderAdminList();
+  await renderAdminList();
   // Date par défaut = aujourd'hui
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
 }
@@ -586,11 +646,11 @@ function clearForm(){
   document.getElementById('admin-title-txt').textContent='Nouvelle entrée';
 }
 
-function saveEntry(){
+async function saveEntry(){
   const title=document.getElementById('f-title').value.trim();
   const content=document.getElementById('f-content').value.trim();
   if(!title||!content){showToast('⚠️ Titre et contenu requis');return;}
-  const entries=loadEntries();
+  const entries=await loadEntries();
   const entry={
     id:editingId||('e'+Date.now()),
     date:document.getElementById('f-date').value,
@@ -611,15 +671,16 @@ function saveEntry(){
   } else {
     entries.push(entry);
   }
-  saveEntries(entries);
-  renderGrid();
+  await saveEntries(entries);
+  _cache=null;
+  await renderGrid();
   renderAdminList();
   clearForm();
   showToast('✅ Entrée publiée !');
 }
 
-function editEntry(id){
-  const e=loadEntries().find(x=>x.id===id);
+async function editEntry(id){
+  const e=(await loadEntries()).find(x=>x.id===id);
   if(!e)return;
   editingId=id;
   document.getElementById('admin-title-txt').textContent='Modifier l\'entrée';
@@ -638,17 +699,19 @@ function editEntry(id){
   document.getElementById('admin-panel').scrollTop=0;
 }
 
-function deleteEntry(id){
+async function deleteEntry(id){
   if(!confirm('Supprimer cette entrée ?'))return;
-  const entries=loadEntries().filter(e=>e.id!==id);
-  saveEntries(entries);
-  renderGrid();
+  const all=await loadEntries();
+  const entries=all.filter(e=>e.id!==id);
+  await saveEntries(entries);
+  _cache=null;
+  await renderGrid();
   renderAdminList();
   showToast('🗑️ Entrée supprimée');
 }
 
-function renderAdminList(){
-  const entries=[...loadEntries()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+async function renderAdminList(){
+  const entries=[...(await loadEntries())].sort((a,b)=>new Date(b.date)-new Date(a.date));
   const el=document.getElementById('admin-list-entries');
   if(entries.length===0){el.innerHTML='<p style="font-size:.8rem;color:rgba(245,232,206,.3)">Aucune entrée</p>';return;}
   const pc={'prep':'#60a5fa','voile':'#34d399','escale':'#f0a840','traversee':'#c084fc','famille':'#fb7185'};
@@ -690,8 +753,7 @@ document.addEventListener('keydown',e=>{
 });
 
 // ── INIT
-seedDemo();
-renderGrid();
+(async()=>{ await seedDemo(); await renderGrid(); })();
 </script>
 </body>
 </html>
