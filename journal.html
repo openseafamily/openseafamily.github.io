@@ -324,8 +324,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 // ══════════════════════════════════════════════════
 // ✏️ CONFIGURATION — remplacez par vos valeurs JSONBin
 // ══════════════════════════════════════════════════
-const JSONBIN_ID  = '6a7ab90af5f4af5e2905ab8e';
-const JSONBIN_KEY = '2a$10$xYqKfsKcOTac4gR8pfug1e.livPWzIO5f9D3tp/bwM8kowLmIGe2u';
+const JSONBIN_ID  = 'VOTRE_BIN_ID';
+const JSONBIN_KEY = 'VOTRE_API_KEY';
 // ✏️ MOT DE PASSE ADMIN — changez-le !
 const ADMIN_PWD   = 'OpenSea2026';
 // ══════════════════════════════════════════════════
@@ -374,9 +374,12 @@ async function fetchEntries(){
 }
 
 async function pushEntries(entries){
-  _entries = entries;
   localStorage.setItem('osf_fb', JSON.stringify(entries));
-  if(!CONFIGURED){ localStorage.setItem('osf_local', JSON.stringify(entries)); return; }
+  if(!CONFIGURED){
+    localStorage.setItem('osf_local', JSON.stringify(entries));
+    _entries = [...entries]; // mise à jour cache immédiate
+    return;
+  }
   loader(true);
   try{
     await fetch(JSONBIN_URL,{
@@ -384,7 +387,11 @@ async function pushEntries(entries){
       headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY,'X-Bin-Versioning':'false'},
       body: JSON.stringify(entries)
     });
-  }catch(e){ toast('⚠️ Sauvegarde échouée — copie locale conservée'); }
+    _entries = [...entries]; // mise à jour cache après succès serveur
+  }catch(e){
+    _entries = [...entries]; // même en cas d'erreur réseau, màj cache local
+    toast('⚠️ Sauvegarde distante échouée — copie locale conservée');
+  }
   finally{ loader(false); }
 }
 
@@ -552,6 +559,7 @@ async function saveEntry(){
   btn.disabled = true;
   btn.textContent = '⏳ Publication…';
 
+  _entries = null; // forcer rechargement frais depuis JSONBin
   const entries = await fetchEntries();
   const entry = {
     id      : _editId || 'e'+Date.now(),
@@ -568,15 +576,18 @@ async function saveEntry(){
     featured: false,
   };
 
+  let newList;
   if(_editId){
     const idx = entries.findIndex(e=>e.id===_editId);
-    if(idx>=0) entries[idx] = entry; else entries.push(entry);
+    newList = [...entries];
+    if(idx>=0) newList[idx] = entry; else newList.push(entry);
   } else {
-    entries.push(entry);
+    newList = [...entries, entry];
   }
 
-  _entries = null; // invalider cache
-  await pushEntries(entries);
+  _entries = null; // invalider avant de reconstruire la liste
+  await pushEntries(newList);
+  // _entries est maintenant mis à jour par pushEntries
   await renderGrid();
   await renderAdminList();
   clearForm();
@@ -607,7 +618,6 @@ async function editEntry(id){
 async function deleteEntry(id){
   if(!confirm('Supprimer cette entrée définitivement ?')) return;
   const entries = await fetchEntries();
-  _entries = null;
   await pushEntries(entries.filter(e=>e.id!==id));
   await renderGrid();
   await renderAdminList();
