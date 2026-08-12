@@ -324,8 +324,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 // ══════════════════════════════════════════════════
 // ✏️ CONFIGURATION — remplacez par vos valeurs JSONBin
 // ══════════════════════════════════════════════════
-const JSONBIN_ID  = '6a7ab90af5f4af5e2905ab8e';
-const JSONBIN_KEY = '2a$10$xYqKfsKcOTac4gR8pfug1e.livPWzIO5f9D3tp/bwM8kowLmIGe2u';
+const JSONBIN_ID  = 'VOTRE_BIN_ID';
+const JSONBIN_KEY = 'VOTRE_API_KEY';
 // ✏️ MOT DE PASSE ADMIN — changez-le !
 const ADMIN_PWD   = 'OpenSea2026';
 // ══════════════════════════════════════════════════
@@ -362,9 +362,18 @@ async function fetchEntries(){
   }
   loader(true);
   try{
-    const r = await fetch(JSONBIN_URL+'/latest',{headers:{'X-Master-Key':JSONBIN_KEY,'X-Bin-Meta':'false'}});
+    const r = await fetch(JSONBIN_URL+'/latest',{
+      headers:{'X-Master-Key':JSONBIN_KEY,'X-Bin-Meta':'false'}
+    });
     const d = await r.json();
-    _entries = Array.isArray(d) ? d : [];
+    // JSONBin retourne soit {record:[...], metadata:{...}} soit directement [...]
+    if(Array.isArray(d)){
+      _entries = d;
+    } else if(d && Array.isArray(d.record)){
+      _entries = d.record;
+    } else {
+      _entries = [];
+    }
   }catch(e){
     toast('⚠️ Erreur de chargement');
     const fb = localStorage.getItem('osf_fb');
